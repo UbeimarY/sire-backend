@@ -38,7 +38,6 @@ src/gateway.ts        Gateway público gRPC-Web + CORS + /health
 src/simulator.ts      Simulador de 6 ambulancias
 src/launcher.ts       Arranca todos los procesos
 src/gen/              Código generado (no editar)
-Dockerfile, render.yaml
 ```
 
 ## Ejecutar en local
@@ -51,20 +50,3 @@ npm run dev        # gateway en http://localhost:8080
 Después de cambiar un `.proto`: `npm run generate`.
 
 Usuarios (contraseña `sire2026`): `operador`, `admin`, `hospital.central`, `hospital.norte`, `hospital.sur`, `hospital.occidente`.
-
-## Desplegar
-
-**Render:** New → Blueprint → este repositorio (usa `render.yaml`). Al terminar, copia la URL pública (ej. `https://sire-backend.onrender.com`); la necesita el frontend. Comprueba que responde en `/health`.
-
-**Railway:** New Project → Deploy from GitHub repo → este repositorio. Railway detecta el `Dockerfile`. Luego *Settings → Networking → Generate Domain*.
-
-En el plan gratuito de Render el servicio se duerme sin uso: abre `/health` un minuto antes de la demo.
-
-| Variable | Descripción |
-|---|---|
-| `PORT` | La inyecta la plataforma; ahí escucha el gateway |
-| `JWT_SECRET` | Secreto para firmar los tokens |
-| `ALLOWED_ORIGINS` | Orígenes CORS permitidos (`*` o la URL del frontend) |
-| `SIM_ENABLED` | `false` para no iniciar el simulador |
-| `SIM_STEP_KM` | Km por segundo de las ambulancias simuladas (0.12) |
-| `CITY_CENTER_LAT`, `CITY_CENTER_LNG` | Centro de la demo (Bogotá por defecto) |
