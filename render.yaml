@@ -1,0 +1,14 @@
+# Render Blueprint (backend): New > Blueprint > select this repository.
+services:
+  - type: web
+    name: sire-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      # Set to the frontend URL (e.g. https://sire-frontend.onrender.com) to restrict CORS.
+      - key: ALLOWED_ORIGINS
+        value: "*"

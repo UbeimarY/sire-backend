@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package sire.v1;
+
+import "sire/v1/common.proto";
+
+message TimelineEntry {
+  IncidentStatus status = 1;
+  string note = 2;
+  int64 at_ms = 3;
+}
+
+message Incident {
+  string id = 1;
+  string description = 2;
+  string address = 3;
+  string caller_name = 4;
+  string caller_phone = 5;
+  GeoPoint location = 6;
+  TriageLevel triage = 7;
+  IncidentStatus status = 8;
+  string ambulance_id = 9;
+  string hospital_id = 10;
+  string hospital_name = 11;
+  int32 eta_seconds = 12;
+  int64 created_at_ms = 13;
+  int64 updated_at_ms = 14;
+  repeated TimelineEntry timeline = 15;
+}
+
+message CreateIncidentRequest {
+  string description = 1;
+  string address = 2;
+  string caller_name = 3;
+  string caller_phone = 4;
+  GeoPoint location = 5;
+  TriageLevel triage = 6;
+}
+
+message CreateIncidentResponse {
+  Incident incident = 1;
+}
+
+message GetIncidentRequest {
+  string id = 1;
+}
+
+message GetIncidentResponse {
+  Incident incident = 1;
+}
+
+message ListIncidentsRequest {}
+
+message ListIncidentsResponse {
+  repeated Incident incidents = 1;
+}
+
+message UpdateIncidentStatusRequest {
+  string incident_id = 1;
+  IncidentStatus status = 2;
+  int32 eta_seconds = 3;
+  string note = 4;
+}
+
+message UpdateIncidentStatusResponse {
+  Incident incident = 1;
+}
+
+message WatchIncidentsRequest {}
+
+message IncidentEvent {
+  Incident incident = 1;
+}
+
+message GetMetricsRequest {}
+
+message TriageCount {
+  TriageLevel triage = 1;
+  int32 count = 2;
+}
+
+message GetMetricsResponse {
+  int32 total_incidents = 1;
+  int32 active_incidents = 2;
+  int32 closed_incidents = 3;
+  int32 pending_incidents = 4;
+  // Average seconds from creation to ambulance on scene.
+  double avg_response_seconds = 5;
+  repeated TriageCount by_triage = 6;
+}
+
+service IncidentService {
+  // Unary: creates the incident and orchestrates Fleet + Hospital + Dispatch.
+  rpc CreateIncident(CreateIncidentRequest) returns (CreateIncidentResponse);
+  rpc GetIncident(GetIncidentRequest) returns (GetIncidentResponse);
+  rpc ListIncidents(ListIncidentsRequest) returns (ListIncidentsResponse);
+  // Unary, called by DispatchService (service-to-service).
+  rpc UpdateIncidentStatus(UpdateIncidentStatusRequest) returns (UpdateIncidentStatusResponse);
+  // Server streaming: live dispatch board.
+  rpc WatchIncidents(WatchIncidentsRequest) returns (stream IncidentEvent);
+  rpc GetMetrics(GetMetricsRequest) returns (GetMetricsResponse);
+}

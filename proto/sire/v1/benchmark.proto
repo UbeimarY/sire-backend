@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package sire.v1;
+
+import "sire/v1/common.proto";
+
+// Same data is served as REST/JSON at GET /api/rest/telemetry?count=N
+// so both formats can be compared (size + latency).
+message TelemetrySample {
+  string ambulance_id = 1;
+  GeoPoint location = 2;
+  double speed_kmh = 3;
+  int32 heart_rate = 4;
+  int32 oxygen_saturation = 5;
+  int64 timestamp_ms = 6;
+  AmbulanceStatus status = 7;
+}
+
+message GetTelemetryRequest {
+  int32 count = 1;
+}
+
+message GetTelemetryResponse {
+  repeated TelemetrySample samples = 1;
+}
+
+service BenchmarkService {
+  rpc GetTelemetry(GetTelemetryRequest) returns (GetTelemetryResponse);
+}

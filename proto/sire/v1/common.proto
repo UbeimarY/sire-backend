@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package sire.v1;
+
+// Geographic coordinate (WGS84).
+message GeoPoint {
+  double lat = 1;
+  double lng = 2;
+}
+
+// Emergency severity, I = most critical, V = least critical.
+enum TriageLevel {
+  TRIAGE_LEVEL_UNSPECIFIED = 0;
+  TRIAGE_LEVEL_I = 1;
+  TRIAGE_LEVEL_II = 2;
+  TRIAGE_LEVEL_III = 3;
+  TRIAGE_LEVEL_IV = 4;
+  TRIAGE_LEVEL_V = 5;
+}
+
+enum AmbulanceStatus {
+  AMBULANCE_STATUS_UNSPECIFIED = 0;
+  AMBULANCE_STATUS_AVAILABLE = 1;
+  AMBULANCE_STATUS_EN_ROUTE = 2;
+  AMBULANCE_STATUS_ON_SCENE = 3;
+  AMBULANCE_STATUS_TRANSPORTING = 4;
+  AMBULANCE_STATUS_AT_HOSPITAL = 5;
+  AMBULANCE_STATUS_OFFLINE = 6;
+}
+
+enum IncidentStatus {
+  INCIDENT_STATUS_UNSPECIFIED = 0;
+  INCIDENT_STATUS_PENDING = 1;
+  INCIDENT_STATUS_ASSIGNED = 2;
+  INCIDENT_STATUS_EN_ROUTE = 3;
+  INCIDENT_STATUS_ON_SCENE = 4;
+  INCIDENT_STATUS_TRANSPORTING = 5;
+  INCIDENT_STATUS_AT_HOSPITAL = 6;
+  INCIDENT_STATUS_CLOSED = 7;
+}

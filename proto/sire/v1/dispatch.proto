@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package sire.v1;
+
+import "sire/v1/common.proto";
+
+// Ambulance -> Dispatch
+message AmbulanceMessage {
+  oneof payload {
+    SessionHello hello = 1;
+    StatusReport status = 2;
+  }
+}
+
+message SessionHello {
+  string ambulance_id = 1;
+}
+
+message StatusReport {
+  string incident_id = 1;
+  AmbulanceStatus status = 2;
+  int32 eta_seconds = 3;
+  string note = 4;
+}
+
+// Dispatch -> Ambulance
+message DispatchMessage {
+  oneof payload {
+    SessionWelcome welcome = 1;
+    Assignment assignment = 2;
+  }
+}
+
+message SessionWelcome {
+  string message = 1;
+}
+
+message Assignment {
+  string incident_id = 1;
+  string description = 2;
+  TriageLevel triage = 3;
+  GeoPoint incident_location = 4;
+  string hospital_id = 5;
+  string hospital_name = 6;
+  GeoPoint hospital_location = 7;
+}
+
+message AssignAmbulanceRequest {
+  string ambulance_id = 1;
+  Assignment assignment = 2;
+}
+
+message AssignAmbulanceResponse {
+  bool delivered = 1;
+}
+
+message ListSessionsRequest {}
+
+message ListSessionsResponse {
+  repeated string ambulance_ids = 1;
+}
+
+service DispatchService {
+  // Bidirectional streaming: ambulance receives assignments and reports status.
+  rpc AmbulanceSession(stream AmbulanceMessage) returns (stream DispatchMessage);
+  // Unary, called by IncidentService (service-to-service).
+  rpc AssignAmbulance(AssignAmbulanceRequest) returns (AssignAmbulanceResponse);
+  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
+}

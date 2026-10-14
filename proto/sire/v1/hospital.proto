@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package sire.v1;
+
+import "sire/v1/common.proto";
+
+message Hospital {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  GeoPoint location = 4;
+  int32 total_beds = 5;
+  int32 available_beds = 6;
+}
+
+message IncomingPatient {
+  string incident_id = 1;
+  TriageLevel triage = 2;
+  string description = 3;
+  string ambulance_id = 4;
+  string ambulance_plate = 5;
+  IncidentStatus status = 6;
+  int32 eta_seconds = 7;
+  int64 updated_at_ms = 8;
+}
+
+message ListHospitalsRequest {}
+
+message ListHospitalsResponse {
+  repeated Hospital hospitals = 1;
+}
+
+message GetAvailableHospitalsRequest {
+  GeoPoint near = 1;
+  TriageLevel triage = 2;
+}
+
+message HospitalOption {
+  Hospital hospital = 1;
+  double distance_km = 2;
+}
+
+message GetAvailableHospitalsResponse {
+  repeated HospitalOption options = 1;
+}
+
+message ReserveBedRequest {
+  string hospital_id = 1;
+  IncomingPatient patient = 2;
+}
+
+message ReserveBedResponse {
+  Hospital hospital = 1;
+}
+
+message UpdateIncomingPatientRequest {
+  string hospital_id = 1;
+  string incident_id = 2;
+  IncidentStatus status = 3;
+  int32 eta_seconds = 4;
+}
+
+message UpdateIncomingPatientResponse {}
+
+message UpdateBedsRequest {
+  string hospital_id = 1;
+  int32 available_beds = 2;
+}
+
+message UpdateBedsResponse {
+  Hospital hospital = 1;
+}
+
+message WatchHospitalsRequest {}
+
+message HospitalEvent {
+  Hospital hospital = 1;
+}
+
+message WatchIncomingPatientsRequest {
+  string hospital_id = 1;
+}
+
+message IncomingPatientEvent {
+  IncomingPatient patient = 1;
+  bool removed = 2;
+}
+
+service HospitalService {
+  rpc ListHospitals(ListHospitalsRequest) returns (ListHospitalsResponse);
+  // Unary, called by IncidentService (service-to-service).
+  rpc GetAvailableHospitals(GetAvailableHospitalsRequest) returns (GetAvailableHospitalsResponse);
+  // Unary, called by IncidentService (service-to-service).
+  rpc ReserveBed(ReserveBedRequest) returns (ReserveBedResponse);
+  // Unary, called by IncidentService (service-to-service).
+  rpc UpdateIncomingPatient(UpdateIncomingPatientRequest) returns (UpdateIncomingPatientResponse);
+  rpc UpdateBeds(UpdateBedsRequest) returns (UpdateBedsResponse);
+  // Server streaming: bed availability for the dispatch map.
+  rpc WatchHospitals(WatchHospitalsRequest) returns (stream HospitalEvent);
+  // Server streaming: patients heading to one hospital.
+  rpc WatchIncomingPatients(WatchIncomingPatientsRequest) returns (stream IncomingPatientEvent);
+}
